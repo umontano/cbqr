@@ -1,8 +1,9 @@
 #!/bin/sh
-token_github="$1"
-repo_name="$2"
-destination_dir=~/a
+repo_name="$1"
+destination_dir=$(pwd)
 local_repo_dir="$destination_dir/$repo_name"
+test -z "$token_github" && export token_github=$(tail -n 1 /sdcard/token.txt || exit 1)
+echo "$token_github"
 
 ## CREATE DIRECTORY
 mkdir -p "$local_repo_dir"
@@ -11,6 +12,10 @@ cd "$local_repo_dir" || exit 1
 
 ## ADDING CREDENTIALS
 git init
+
+delinked_dir=$(realpath "$local_repo_dir")
+git config --global --add safe.directory "$delinked_dir"/
+
 git config --global --add safe.directory "$local_repo_dir"/
 git config --global user.name umontano
 git config --global user.email u.montano.j@gmail.com
@@ -24,3 +29,6 @@ git commit -m "first commit"
 git branch -M main
 git remote add origin git@github.com:umontano/"$repo_name".git
 git push -u origin main
+
+git config --global --add safe.directory "$delinked_dir"/
+
